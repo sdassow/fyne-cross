@@ -239,16 +239,16 @@ func fyneRelease(ctx Context, image containerImage) error {
 	case androidOS:
 		workDir = volume.JoinPathContainer(workDir, ctx.Package)
 		if ctx.Keystore != "" {
-			args = append(args, "-keyStore", ctx.Keystore)
+			args = append(args, "-key-store", ctx.Keystore)
 		}
 		if ctx.KeystorePass != "" {
-			args = append(args, "-keyStorePass", ctx.KeystorePass)
+			args = append(args, "-key-store-pass", ctx.KeystorePass)
 		}
 		if ctx.KeyPass != "" {
-			args = append(args, "-keyPass", ctx.KeyPass)
+			args = append(args, "-key-pass", ctx.KeyPass)
 		}
 		if ctx.KeyName != "" {
-			args = append(args, "-keyName", ctx.KeyName)
+			args = append(args, "-key-name", ctx.KeyName)
 		}
 	case iosOS:
 		if ctx.Certificate != "" {
