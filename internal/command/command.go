@@ -184,7 +184,7 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 
 	appBuildOpt := "-app-build"
 	appVersionOpt := "-app-version"
-	if semver.Compare(fyneVersion, "v1.6.0") < 0 {
+	if semver.Compare(fyneVersion, "v2.0.0") >= 0 {
 		appBuildOpt = "-appBuild"
 		appVersionOpt = "-appVersion"
 	}
