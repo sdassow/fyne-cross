@@ -10,6 +10,7 @@ import (
 	"github.com/fyne-io/fyne-cross/internal/icon"
 	"github.com/fyne-io/fyne-cross/internal/log"
 	"github.com/fyne-io/fyne-cross/internal/volume"
+	"golang.org/x/mod/semver"
 	"golang.org/x/sys/execabs"
 )
 
@@ -160,26 +161,46 @@ func checkFyneBinHost(ctx Context) (string, error) {
 	}
 
 	if debugging() {
-		out, err := execabs.Command(fyne, "version").Output()
-		if err != nil {
-			return fyne, fmt.Errorf("could not get fyne cli %s version: %v", fyne, err)
-		}
-		log.Debugf("%s", out)
+		log.Debugf("fyne cli version: %s", fyneCommandVersion(fyne))
 	}
 
 	return fyne, nil
 }
 
+func fyneCommandVersion(fyne string) string {
+	out, err := execabs.Command(fyne, "version").Output()
+	if err != nil {
+		return ""
+	}
+
+	for _, line := range strings.Split(string(out), "\n") {
+		ver, found := strings.CutPrefix(line, "fyne cli version: ")
+		if found {
+			return ver
+		}
+	}
+
+	return ""
+}
+
 func fyneCommand(binary, command, icon string, ctx Context, image containerImage) []string {
 	target := image.Target()
+	fyneVersion := fyneCommandVersion(binary)
+
+	appBuildOpt := "-app-build"
+	appVersionOpt := "-app-version"
+	if semver.Compare(fyneVersion, "v1.6.0") < 0 {
+		appBuildOpt = "-appBuild"
+		appVersionOpt = "-appVersion"
+	}
 
 	args := []string{
 		binary, command,
 		"-os", target,
 		"-name", ctx.Name,
 		"-icon", icon,
-		"-app-build", ctx.AppBuild,
-		"-app-version", ctx.AppVersion,
+		appBuildOpt, ctx.AppBuild,
+		appVersionOpt, ctx.AppVersion,
 	}
 
 	// add appID to command, if any
