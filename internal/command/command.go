@@ -168,13 +168,18 @@ func checkFyneBinHost(ctx Context) (string, error) {
 }
 
 func fyneCommandVersion(fyne string) string {
-	out, _ := execabs.Command(fyne, "version").Output()
+	out, err := execabs.Command(fyne, "version").Output()
+	if err != nil {
+		return ""
+	}
+
 	for _, line := range strings.Split(string(out), "\n") {
 		_, ver, found := strings.Cut(line, "fyne cli version: ")
 		if found {
 			return ver
 		}
 	}
+
 	return ""
 }
 
