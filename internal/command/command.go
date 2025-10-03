@@ -174,7 +174,7 @@ func fyneCommandVersion(fyne string) string {
 	}
 
 	for _, line := range strings.Split(string(out), "\n") {
-		ver, found := strings.CutPrefix(line, "fyne cli version: ")
+		_, ver, found := strings.Cut(line, "fyne cli version: ")
 		if found {
 			return ver
 		}
