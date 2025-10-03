@@ -200,7 +200,7 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 
 	// add appID to command, if any
 	if ctx.AppID != "" {
-		args = append(args, "-app-id", ctx.AppID)
+		args = append(args, "-id", ctx.AppID)
 	}
 
 	// add tags to command, if any
