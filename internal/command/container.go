@@ -232,6 +232,18 @@ func fyneRelease(ctx Context, image containerImage) error {
 		return err
 	}
 
+	keyStoreOpt := "-key-store"
+	keyStorePassOpt := "-key-store-pass"
+	keyPassOpt := "-key-pass"
+	keyNameOpt := "-key-name"
+
+	if fyneCommandVersionCompare(fyneBin, "v2.0.0") >= 0 {
+		keyStoreOpt = "-keyStore"
+		keyStorePassOpt = "-keyStorePass"
+		keyPassOpt = "-keyPass"
+		keyNameOpt = "-keyName"
+	}
+
 	// workDir default value
 	workDir := ctx.WorkDirContainer()
 
@@ -239,16 +251,16 @@ func fyneRelease(ctx Context, image containerImage) error {
 	case androidOS:
 		workDir = volume.JoinPathContainer(workDir, ctx.Package)
 		if ctx.Keystore != "" {
-			args = append(args, "-key-store", ctx.Keystore)
+			args = append(args, keyStoreOpt, ctx.Keystore)
 		}
 		if ctx.KeystorePass != "" {
-			args = append(args, "-key-store-pass", ctx.KeystorePass)
+			args = append(args, keyStorePassOpt, ctx.KeystorePass)
 		}
 		if ctx.KeyPass != "" {
-			args = append(args, "-key-pass", ctx.KeyPass)
+			args = append(args, keyPassOpt, ctx.KeyPass)
 		}
 		if ctx.KeyName != "" {
-			args = append(args, "-key-name", ctx.KeyName)
+			args = append(args, keyNameOpt, ctx.KeyName)
 		}
 	case iosOS:
 		if ctx.Certificate != "" {
