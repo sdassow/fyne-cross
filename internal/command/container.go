@@ -224,6 +224,18 @@ func fynePackage(ctx Context, image containerImage) error {
 	return nil
 }
 
+// concatNonEmptyNamedArgs returns name and value pairs, filtering out pairs with empty value
+func concatNonEmptyNamedArgs(args ...string) []string {
+	r := []string{}
+	for n := 0; n < len(args)/2; n++ {
+		if args[n*2+1] == "" {
+			continue
+		}
+		r = append(r, args[n*2], args[n*2+1])
+	}
+	return r
+}
+
 // fyneRelease package and release the application using the fyne cli tool
 // Note: at the moment this is used only for the android builds
 func fyneRelease(ctx Context, image containerImage) error {
@@ -250,18 +262,12 @@ func fyneRelease(ctx Context, image containerImage) error {
 	switch image.OS() {
 	case androidOS:
 		workDir = volume.JoinPathContainer(workDir, ctx.Package)
-		if ctx.Keystore != "" {
-			args = append(args, keyStoreOpt, ctx.Keystore)
-		}
-		if ctx.KeystorePass != "" {
-			args = append(args, keyStorePassOpt, ctx.KeystorePass)
-		}
-		if ctx.KeyPass != "" {
-			args = append(args, keyPassOpt, ctx.KeyPass)
-		}
-		if ctx.KeyName != "" {
-			args = append(args, keyNameOpt, ctx.KeyName)
-		}
+		args = append(args, concatNonEmptyNamedArgs(
+			keyStoreOpt, ctx.Keystore,
+			keyStorePassOpt, ctx.KeystorePass,
+			keyPassOpt, ctx.KeyPass,
+			keyNameOpt, ctx.KeyName,
+		)...)
 	case iosOS:
 		if ctx.Certificate != "" {
 			args = append(args, "-certificate", ctx.Certificate)
