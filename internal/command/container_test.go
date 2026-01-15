@@ -7,12 +7,12 @@ import (
 )
 
 func Test_concatNonEmptyNamedArgs(t *testing.T) {
-	assert.Equal(t, []string{"-foo","42","-baz","64"}, concatNonEmptyNamedArgs(
+	assert.Equal(t, []string{"-foo", "42", "-baz", "64"}, concatNonEmptyNamedArgs(
 		"-foo", "42",
 		"-bar", "",
 		"-baz", "64",
 	), "filter empty argument/value pair")
-	assert.Equal(t, []string{"-foo","42"}, concatNonEmptyNamedArgs(
+	assert.Equal(t, []string{"-foo", "42"}, concatNonEmptyNamedArgs(
 		"-foo", "42",
 		"-bar", "",
 		"-baz",
