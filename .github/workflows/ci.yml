@@ -78,7 +78,7 @@ jobs:
     - run: go build -tags k8s
 
   build-with-old-cli:
-    name: "Build Calculator (with old fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    name: "Build Calculator (with old Fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
       GO111MODULE: on
@@ -140,6 +140,7 @@ jobs:
       - name: Install Fyne
         run: |
           go install fyne.io/fyne/v2/cmd/fyne@latest
+          fyne version
 
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
@@ -155,7 +156,7 @@ jobs:
             -name calculator${{ matrix.target.ext }}
 
   build-with-new-cli:
-    name: "Build Calculator (with new fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    name: "Build Calculator (with new Fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
       GO111MODULE: on
@@ -217,6 +218,7 @@ jobs:
       - name: Install Fyne
         run: |
           go install fyne.io/tools/cmd/fyne@latest
+          fyne version
 
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
@@ -232,7 +234,7 @@ jobs:
             -name calculator${{ matrix.target.ext }}
 
   build-fyneterm-with-old-cli:
-    name: "Build Fyneterm (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    name: "Build Fyneterm (with old Fyne CLI) ((${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
       GO111MODULE: on
@@ -293,6 +295,7 @@ jobs:
       - name: Install Fyne
         run: |
           go install fyne.io/fyne/v2/cmd/fyne@latest
+          fyne version
 
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
@@ -308,7 +311,7 @@ jobs:
             -name fyneterm${{ matrix.target.ext }} cmd/fyneterm
 
   build-fyneterm-with-new-cli:
-    name: "Build Fyneterm (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    name: "Build Fyneterm (with new Fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
       GO111MODULE: on
@@ -369,6 +372,7 @@ jobs:
       - name: Install Fyne
         run: |
           go install fyne.io/tools/cmd/fyne@latest
+          fyne version
 
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
