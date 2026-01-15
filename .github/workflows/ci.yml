@@ -140,10 +140,6 @@ jobs:
         run: |
           go install fyne.io/fyne/v2/cmd/fyne@latest
           fyne version
-
-      - name: Install Docker
-        if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@v1.0.0
     
       - name: Build
         working-directory: calculator
@@ -217,10 +213,6 @@ jobs:
         run: |
           go install fyne.io/tools/cmd/fyne@latest
           fyne version
-
-      - name: Install Docker
-        if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@v1.0.0
     
       - name: Build
         working-directory: calculator
@@ -293,10 +285,6 @@ jobs:
         run: |
           go install fyne.io/fyne/v2/cmd/fyne@latest
           fyne version
-
-      - name: Install Docker
-        if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@v1.0.0
  
       - name: Build
         working-directory: terminal
@@ -369,10 +357,6 @@ jobs:
         run: |
           go install fyne.io/tools/cmd/fyne@latest
           fyne version
-
-      - name: Install Docker
-        if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@v1.0.0
  
       - name: Build
         working-directory: terminal
