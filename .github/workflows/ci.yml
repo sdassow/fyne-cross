@@ -112,6 +112,10 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
+      - name: Add GOPATH/bin to PATH
+        if: ${{ matrix.target.os == 'darwin' }}
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -134,11 +138,7 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: |
-          if [ "${{ matrix.target.os }}" = "darwin" ]; then
-            export PATH="$(go env GOPATH)/bin:$PATH"
-          fi
-          go install
+        run: go install
 
       - name: Install Fyne
         run: |
@@ -189,6 +189,10 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
+      - name: Add GOPATH/bin to PATH
+        if: ${{ matrix.target.os == 'darwin' }}
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -211,11 +215,7 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: |
-          if [ "${{ matrix.target.os }}" = "darwin" ]; then
-            export PATH="$(go env GOPATH)/bin:$PATH"
-          fi
-          go install
+        run: go install
 
       - name: Install Fyne
         run: |
@@ -265,6 +265,9 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
+      - name: Add GOPATH/bin to PATH
+        if: ${{ matrix.target.os == 'darwin' }}
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -287,11 +290,7 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: |
-          if [ "${{ matrix.target.os }}" = "darwin" ]; then
-            export PATH="$(go env GOPATH)/bin:$PATH"
-          fi
-          go install
+        run: go install
 
       - name: Install Fyne
         run: |
@@ -341,6 +340,10 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
+      - name: Add GOPATH/bin to PATH
+        if: ${{ matrix.target.os == 'darwin' }}
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -363,11 +366,7 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: |
-          if [ "${{ matrix.target.os }}" = "darwin" ]; then
-            export PATH="$(go env GOPATH)/bin:$PATH"
-          fi
-          go install
+        run: go install
 
       - name: Install Fyne
         run: |
