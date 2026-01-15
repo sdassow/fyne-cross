@@ -191,9 +191,11 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 
 	appBuildOpt := "-app-build"
 	appVersionOpt := "-app-version"
+	appIDOpt := "-app-id"
 	if fyneCommandVersionCompare(binary, "v2.0.0") >= 0 {
 		appBuildOpt = "-appBuild"
 		appVersionOpt = "-appVersion"
+		appIDOpt = "-appID"
 	}
 
 	args := []string{
@@ -207,7 +209,7 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 
 	// add appID to command, if any
 	if ctx.AppID != "" {
-		args = append(args, "-id", ctx.AppID)
+		args = append(args, appIDOpt, ctx.AppID)
 	}
 
 	// add tags to command, if any
