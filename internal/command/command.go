@@ -173,7 +173,11 @@ func checkFyneBinHost(ctx Context) (string, error) {
 
 func fyneCommandVersion(fyne string) string {
 	out, _ := execabs.Command(fyne, "version").Output()
-	for _, line := range strings.Split(string(out), "\n") {
+	return fyneCommandVersionFromOutput(string(out))
+}
+
+func fyneCommandVersionFromOutput(out string) string {
+	for _, line := range strings.Split(out, "\n") {
 		_, ver, found := strings.Cut(line, "fyne cli version: ")
 		if found {
 			return ver
@@ -182,8 +186,35 @@ func fyneCommandVersion(fyne string) string {
 	return ""
 }
 
+func fyneCommandVersionContainer(ctx Context, image containerImage) (string, error) {
+	const versionFileName = "fyne-version.txt"
+
+	versionFileContainer := volume.JoinPathContainer(ctx.TmpDirContainer(), image.ID(), versionFileName)
+	versionFileHost := volume.JoinPathHost(ctx.TmpDirHost(), image.ID(), versionFileName)
+
+	err := image.Run(ctx.Volume, options{}, []string{"sh", "-c", fmt.Sprintf("%s version > %q", fyneBin, versionFileContainer)})
+	if err != nil {
+		return "", err
+	}
+
+	b, err := os.ReadFile(versionFileHost)
+	if err != nil {
+		return "", err
+	}
+
+	return fyneCommandVersionFromOutput(string(b)), nil
+}
+
 func fyneCommandVersionCompare(fyne, ver string) int {
 	return semver.Compare(fyneCommandVersion(fyne), ver)
+}
+
+func fyneCommandVersionCompareContainer(ctx Context, image containerImage, ver string) int {
+	actual, err := fyneCommandVersionContainer(ctx, image)
+	if err != nil {
+		return -1
+	}
+	return semver.Compare(actual, ver)
 }
 
 func fyneCommand(binary, command, icon string, ctx Context, image containerImage) []string {
@@ -192,7 +223,11 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 	appBuildOpt := "-app-build"
 	appVersionOpt := "-app-version"
 	appIDOpt := "-app-id"
-	if fyneCommandVersionCompare(binary, "v2.0.0") >= 0 {
+	cmp := fyneCommandVersionCompare(binary, "v2.0.0") // binary is local
+	if binary == fyneBin {                             // binary is container
+		cmp = fyneCommandVersionCompareContainer(ctx, image, "v2.0.0")
+	}
+	if cmp >= 0 {
 		appBuildOpt = "-appBuild"
 		appVersionOpt = "-appVersion"
 		appIDOpt = "-appID"

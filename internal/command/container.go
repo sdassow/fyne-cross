@@ -249,7 +249,7 @@ func fyneRelease(ctx Context, image containerImage) error {
 	keyPassOpt := "-key-pass"
 	keyNameOpt := "-key-name"
 
-	if fyneCommandVersionCompare(fyneBin, "v2.0.0") >= 0 {
+	if fyneCommandVersionCompareContainer(ctx, image, "v2.0.0") >= 0 {
 		keyStoreOpt = "-keyStore"
 		keyStorePassOpt = "-keyStorePass"
 		keyPassOpt = "-keyPass"
