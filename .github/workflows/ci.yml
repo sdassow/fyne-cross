@@ -134,7 +134,11 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: go install
+        run: |
+          if [ "${{ matrix.target.os }}" = "darwin" ]; then
+            export PATH="$(go env GOPATH)/bin:$PATH"
+          fi
+          go install
 
       - name: Install Fyne
         run: |
@@ -207,7 +211,11 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: go install
+        run: |
+          if [ "${{ matrix.target.os }}" = "darwin" ]; then
+            export PATH="$(go env GOPATH)/bin:$PATH"
+          fi
+          go install
 
       - name: Install Fyne
         run: |
@@ -279,7 +287,11 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: go install
+        run: |
+          if [ "${{ matrix.target.os }}" = "darwin" ]; then
+            export PATH="$(go env GOPATH)/bin:$PATH"
+          fi
+          go install
 
       - name: Install Fyne
         run: |
@@ -351,7 +363,11 @@ jobs:
 
       - name: Install Fyne-cross
         working-directory: fyne-cross
-        run: go install
+        run: |
+          if [ "${{ matrix.target.os }}" = "darwin" ]; then
+            export PATH="$(go env GOPATH)/bin:$PATH"
+          fi
+          go install
 
       - name: Install Fyne
         run: |
