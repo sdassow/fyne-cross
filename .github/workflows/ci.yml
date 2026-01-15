@@ -96,7 +96,7 @@ jobs:
             args: -app-id calc.sha${{ github.sha }}
           - os: darwin
             args: -app-id calc.sha${{ github.sha }}
-            host: macos-15
+            host: macos-15-intel # docker not supported on arm64 https://github.com/douglascamata/setup-docker-macos-action?tab=readme-ov-file#arm64-processors-m-series-used-on-macos-15-images-and-beyond-are-unsupported
           - os: web
           
           ## Currently not easily supported from GitHub actions.
@@ -111,10 +111,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
-
-      - name: Add GOPATH/bin to PATH
-        if: ${{ matrix.target.os == 'darwin' }}
-        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -173,7 +169,7 @@ jobs:
             args: -app-id calc.sha${{ github.sha }}
           - os: darwin
             args: -app-id calc.sha${{ github.sha }}
-            host: macos-15
+            host: macos-15-intel # docker not supported on arm64 https://github.com/douglascamata/setup-docker-macos-action?tab=readme-ov-file#arm64-processors-m-series-used-on-macos-15-images-and-beyond-are-unsupported
           - os: web
           
           ## Currently not easily supported from GitHub actions.
@@ -188,10 +184,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
-
-      - name: Add GOPATH/bin to PATH
-        if: ${{ matrix.target.os == 'darwin' }}
-        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -250,7 +242,7 @@ jobs:
             args: -app-id calc.sha${{ github.sha }}
           - os: darwin
             args: -app-id calc.sha${{ github.sha }}
-            host: macos-15
+            host: macos-15-intel # docker not supported on arm64 https://github.com/douglascamata/setup-docker-macos-action?tab=readme-ov-file#arm64-processors-m-series-used-on-macos-15-images-and-beyond-are-unsupported
           
           ## Currently not easily supported from GitHub actions.
           ## https://github.com/fyne-io/fyne-cross/pull/104#issuecomment-1099494308
@@ -265,9 +257,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Add GOPATH/bin to PATH
-        if: ${{ matrix.target.os == 'darwin' }}
-        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -325,7 +314,7 @@ jobs:
             args: -app-id calc.sha${{ github.sha }}
           - os: darwin
             args: -app-id calc.sha${{ github.sha }}
-            host: macos-15
+            host: macos-15-intel # docker not supported on arm64 https://github.com/douglascamata/setup-docker-macos-action?tab=readme-ov-file#arm64-processors-m-series-used-on-macos-15-images-and-beyond-are-unsupported
           
           ## Currently not easily supported from GitHub actions.
           ## https://github.com/fyne-io/fyne-cross/pull/104#issuecomment-1099494308
@@ -339,10 +328,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
-
-      - name: Add GOPATH/bin to PATH
-        if: ${{ matrix.target.os == 'darwin' }}
-        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Checkout code
         uses: actions/checkout@v3
