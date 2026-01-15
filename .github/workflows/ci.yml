@@ -232,7 +232,7 @@ jobs:
             -name calculator${{ matrix.target.ext }}
 
   build-fyneterm-with-old-cli:
-    name: "Build Fyneterm (with old Fyne CLI) ((${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    name: "Build Fyneterm (with old Fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
       GO111MODULE: on

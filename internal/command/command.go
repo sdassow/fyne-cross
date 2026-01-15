@@ -186,25 +186,6 @@ func fyneCommandVersionFromOutput(out string) string {
 	return ""
 }
 
-func fyneCommandVersionContainer(ctx Context, image containerImage) (string, error) {
-	const versionFileName = "fyne-version.txt"
-
-	versionFileContainer := volume.JoinPathContainer(ctx.TmpDirContainer(), image.ID(), versionFileName)
-	versionFileHost := volume.JoinPathHost(ctx.TmpDirHost(), image.ID(), versionFileName)
-
-	err := image.Run(ctx.Volume, options{}, []string{"sh", "-c", fmt.Sprintf("%s version > %q", fyneBin, versionFileContainer)})
-	if err != nil {
-		return "", err
-	}
-
-	b, err := os.ReadFile(versionFileHost)
-	if err != nil {
-		return "", err
-	}
-
-	return fyneCommandVersionFromOutput(string(b)), nil
-}
-
 func fyneCommandVersionCompare(fyne, ver string) int {
 	return semver.Compare(fyneCommandVersion(fyne), ver)
 }

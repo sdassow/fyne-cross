@@ -177,6 +177,25 @@ func goModInit(ctx Context, image containerImage) error {
 	return nil
 }
 
+func fyneCommandVersionContainer(ctx Context, image containerImage) (string, error) {
+	const versionFileName = "fyne-version.txt"
+
+	versionFileContainer := volume.JoinPathContainer(ctx.TmpDirContainer(), image.ID(), versionFileName)
+	versionFileHost := volume.JoinPathHost(ctx.TmpDirHost(), image.ID(), versionFileName)
+
+	err := image.Run(ctx.Volume, options{}, []string{"sh", "-c", fmt.Sprintf("%s version > %q", fyneBin, versionFileContainer)})
+	if err != nil {
+		return "", err
+	}
+
+	b, err := os.ReadFile(versionFileHost)
+	if err != nil {
+		return "", err
+	}
+
+	return fyneCommandVersionFromOutput(string(b)), nil
+}
+
 func fyneCommandContainer(command string, ctx Context, image containerImage) ([]string, error) {
 	if debugging() {
 		err := image.Run(ctx.Volume, options{}, []string{fyneBin, "version"})
