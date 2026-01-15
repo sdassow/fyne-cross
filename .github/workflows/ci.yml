@@ -143,7 +143,7 @@ jobs:
 
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@1.1.0
+        uses: douglascamata/setup-docker-macos-action@v1.1.0
 
       - name: Build
         working-directory: calculator
@@ -220,7 +220,7 @@ jobs:
 
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@1.1.0
+        uses: douglascamata/setup-docker-macos-action@v1.1.0
 
       - name: Build
         working-directory: calculator
@@ -296,7 +296,7 @@ jobs:
  
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@1.1.0
+        uses: douglascamata/setup-docker-macos-action@v1.1.0
 
       - name: Build
         working-directory: terminal
@@ -372,7 +372,7 @@ jobs:
  
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
-        uses: douglascamata/setup-docker-macos-action@1.1.0
+        uses: douglascamata/setup-docker-macos-action@v1.1.0
 
       - name: Build
         working-directory: terminal
