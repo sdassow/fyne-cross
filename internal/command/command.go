@@ -196,6 +196,9 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 		appBuildOpt = "-appBuild"
 		appVersionOpt = "-appVersion"
 		appIDOpt = "-appID"
+		if debugging() {
+			log.Debugf("old fyne CLI tool detected, using old flag format")
+		}
 	}
 
 	args := []string{

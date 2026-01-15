@@ -78,7 +78,7 @@ jobs:
     - run: go build -tags k8s
 
   build-with-old-cli:
-    name: "Build Calculator (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    name: "Build Calculator (with old fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
       GO111MODULE: on
@@ -155,7 +155,7 @@ jobs:
             -name calculator${{ matrix.target.ext }}
 
   build-with-new-cli:
-    name: "Build Calculator (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    name: "Build Calculator (with new fyne CLI) (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
       GO111MODULE: on
