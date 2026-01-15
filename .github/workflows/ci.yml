@@ -77,7 +77,7 @@ jobs:
     # Run tests
     - run: go build -tags k8s
 
-  build:
+  build-with-old-cli:
     name: "Build Calculator (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
@@ -154,7 +154,84 @@ jobs:
             -debug -no-cache \
             -name calculator${{ matrix.target.ext }}
 
-  build-fyneterm:
+  build-with-new-cli:
+    name: "Build Calculator (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
+    env:
+      GO111MODULE: on
+    strategy:
+      fail-fast: false
+      matrix:
+        # use max/min supported Go versions
+        go-version: ["1.23.x", "1.19.x"]
+        target:
+          - os: linux
+          - os: windows
+            ext: .exe
+          - os: freebsd
+          - os: android
+            args: -app-id calc.sha${{ github.sha }}
+          - os: darwin
+            args: -app-id calc.sha${{ github.sha }}
+          # Only macos-13 is supported as macos-14 is running in a VM on Mac M1 which are incompatible with docker/podman
+            host: macos-13
+          - os: web
+          
+          ## Currently not easily supported from GitHub actions.
+          ## https://github.com/fyne-io/fyne-cross/pull/104#issuecomment-1099494308
+          # - os: ios
+          #   args: -app-id calc.sha${{ github.sha }}
+          #   host: macos-latest
+
+    steps:
+      - name: Setup Go environment
+        id: setup-go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          path: fyne-cross
+
+      - name: Checkout fyne-io/calculator
+        uses: actions/checkout@v3
+        with:
+          repository: fyne-io/calculator
+          path: calculator
+
+      - name: Cache build artifacts
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+            ~/.cache/fyne-cross
+          key: ${{ runner.os }}-build-cache-${{ hashFiles('**/go.sum') }}
+
+      - name: Install Fyne-cross
+        working-directory: fyne-cross
+        run: go install
+
+      - name: Install Fyne
+        run: |
+          go install fyne.io/tools/cmd/fyne@latest
+
+      - name: Install Docker
+        if: ${{ runner.os == 'macos' }}
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+    
+      - name: Build
+        working-directory: calculator
+        run: |
+          fyne-cross \
+            ${{ matrix.target.os }} \
+            ${{ matrix.target.args }} \
+            -debug -no-cache \
+            -name calculator${{ matrix.target.ext }}
+
+  build-fyneterm-with-old-cli:
     name: "Build Fyneterm (${{ matrix.target.os }}, ${{ matrix.go-version }})"
     runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
     env:
@@ -216,6 +293,82 @@ jobs:
       - name: Install Fyne
         run: |
           go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Install Docker
+        if: ${{ runner.os == 'macos' }}
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+ 
+      - name: Build
+        working-directory: terminal
+        run: |
+          fyne-cross \
+            ${{ matrix.target.os }} \
+            ${{ matrix.target.args }} \
+            -debug \
+            -name fyneterm${{ matrix.target.ext }} cmd/fyneterm
+
+  build-fyneterm-with-new-cli:
+    name: "Build Fyneterm (${{ matrix.target.os }}, ${{ matrix.go-version }})"
+    runs-on: ${{ matrix.target.host || 'ubuntu-latest' }}
+    env:
+      GO111MODULE: on
+    strategy:
+      fail-fast: false
+      matrix:
+        # use max/min supported Go versions
+        go-version: ["1.23.x", "1.19.x"]
+        target:
+          - os: linux
+          - os: windows
+            ext: .exe
+          - os: freebsd
+          - os: android
+            args: -app-id calc.sha${{ github.sha }}
+          - os: darwin
+            args: -app-id calc.sha${{ github.sha }}
+          # Only macos-13 is supported as macos-14 is running in a VM on Mac M1 which are incompatible with docker/podman
+            host: macos-13
+          
+          ## Currently not easily supported from GitHub actions.
+          ## https://github.com/fyne-io/fyne-cross/pull/104#issuecomment-1099494308
+          # - os: ios
+          #   args: -app-id calc.sha${{ github.sha }}
+          #   host: macos-latest
+
+    steps:
+      - name: Setup Go environment
+        id: setup-go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          path: fyne-cross
+
+      - name: Checkout fyne-io/terminal
+        uses: actions/checkout@v3
+        with:
+          repository: fyne-io/terminal
+          path: terminal
+
+      - name: Cache build artifacts
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+            ~/.cache/fyne-cross
+          key: ${{ runner.os }}-build-cache-${{ hashFiles('**/go.sum') }}
+
+      - name: Install Fyne-cross
+        working-directory: fyne-cross
+        run: go install
+
+      - name: Install Fyne
+        run: |
+          go install fyne.io/tools/cmd/fyne@latest
 
       - name: Install Docker
         if: ${{ runner.os == 'macos' }}
