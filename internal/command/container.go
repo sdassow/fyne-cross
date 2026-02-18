@@ -29,6 +29,7 @@ type baseEngine struct {
 
 type containerImage interface {
 	Run(vol volume.Volume, opts options, cmdArgs []string) error
+	Command(vol volume.Volume, opts options, cmdArgs []string) (string, error)
 	Prepare() error
 	Finalize(packageName string) error
 
@@ -249,7 +250,7 @@ func fyneRelease(ctx Context, image containerImage) error {
 	keyPassOpt := "-key-pass"
 	keyNameOpt := "-key-name"
 
-	if fyneCommandVersionCompare(fyneBin, "v2.0.0") >= 0 {
+	if fyneCommandVersionCompare(fyneBin, "v2.0.0", ctx, image) >= 0 {
 		keyStoreOpt = "-keyStore"
 		keyStorePassOpt = "-keyStorePass"
 		keyPassOpt = "-keyPass"

@@ -164,26 +164,22 @@ func checkFyneBinHost(ctx Context) (string, error) {
 		return "", fmt.Errorf("missed requirement: fyne. To install: `go install fyne.io/fyne/v2/cmd/fyne@latest` and add $GOPATH/bin to $PATH")
 	}
 
-	if debugging() {
-		log.Debugf("fyne cli version: %s", fyneCommandVersion(fyne))
-	}
-
 	return fyne, nil
 }
 
-func fyneCommandVersion(fyne string) string {
-	out, _ := execabs.Command(fyne, "version").Output()
+func fyneCommandVersion(fyne string, ctx Context, image containerImage) string {
+	out, _ := image.Command(ctx.Volume, options{}, []string{fyne, "version"})
 	for _, line := range strings.Split(string(out), "\n") {
 		_, ver, found := strings.Cut(line, "fyne cli version: ")
 		if found {
-			return ver
+			return strings.TrimSuffix(ver, "\r")
 		}
 	}
 	return ""
 }
 
-func fyneCommandVersionCompare(fyne, ver string) int {
-	return semver.Compare(fyneCommandVersion(fyne), ver)
+func fyneCommandVersionCompare(fyne, ver string, ctx Context, image containerImage) int {
+	return semver.Compare(fyneCommandVersion(fyne, ctx, image), ver)
 }
 
 func fyneCommand(binary, command, icon string, ctx Context, image containerImage) []string {
@@ -191,7 +187,7 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 
 	appBuildOpt := "-app-build"
 	appVersionOpt := "-app-version"
-	if fyneCommandVersionCompare(binary, "v2.0.0") >= 0 {
+	if fyneCommandVersionCompare(binary, "v2.0.0", ctx, image) >= 0 {
 		appBuildOpt = "-appBuild"
 		appVersionOpt = "-appVersion"
 	}
