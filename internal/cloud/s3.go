@@ -11,11 +11,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/klauspost/compress/zstd"
 	"golang.org/x/sync/errgroup"
 
@@ -23,8 +23,8 @@ import (
 )
 
 type AWSSession struct {
+	s      *session.Session
 	bucket string
-	client *s3.Client
 
 	m      sync.Mutex
 	cancel context.CancelFunc
@@ -43,28 +43,38 @@ func NewAWSSessionFromEnvironment() (*AWSSession, error) {
 }
 
 func NewAWSSession(akid string, secret string, endpoint string, region string, bucket string) (*AWSSession, error) {
-	var cred credentials.StaticCredentialsProvider
+	var cred *credentials.Credentials
 
 	if len(bucket) == 0 {
 		return nil, fmt.Errorf("no bucket specified")
 	}
 
 	if akid != "" && secret != "" {
-		cred = credentials.NewStaticCredentialsProvider(akid, secret, "")
+		cred = credentials.NewStaticCredentials(akid, secret, "")
 	}
 
-	cfg, err := config.LoadDefaultConfig(
-		context.Background(),
-		config.WithRegion(region),
-		config.WithCredentialsProvider(cred),
+	s, err := session.NewSession(
+		&aws.Config{
+			Endpoint:    aws.String(endpoint),
+			Region:      aws.String(region),
+			Credentials: cred,
+		},
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	client := s3.NewFromConfig(cfg)
+	return &AWSSession{s: s, bucket: bucket, cancel: func() {}}, nil
+}
 
-	return &AWSSession{client: client, bucket: bucket, cancel: func() {}}, nil
+func (a *AWSSession) GetCredentials() (credentials.Value, error) {
+	a.m.Lock()
+	ctx, cancel := context.WithCancel(context.Background())
+	a.cancel = cancel
+	a.m.Unlock()
+	defer a.Cancel()
+
+	return a.s.Config.Credentials.GetWithContext(ctx)
 }
 
 func (a *AWSSession) UploadFile(localFile string, s3FilePath string) error {
@@ -74,7 +84,7 @@ func (a *AWSSession) UploadFile(localFile string, s3FilePath string) error {
 	}
 	defer file.Close()
 
-	uploader := manager.NewUploader(a.client)
+	uploader := s3manager.NewUploader(a.s)
 
 	a.m.Lock()
 	ctxt, cancel := context.WithCancel(context.Background())
@@ -82,7 +92,7 @@ func (a *AWSSession) UploadFile(localFile string, s3FilePath string) error {
 	a.m.Unlock()
 	defer a.Cancel()
 
-	_, err = uploader.Upload(ctxt, &s3.PutObjectInput{
+	_, err = uploader.UploadWithContext(ctxt, &s3manager.UploadInput{
 		Bucket: aws.String(a.bucket),
 		Key:    aws.String(s3FilePath),
 
@@ -194,7 +204,7 @@ func (a *AWSSession) UploadCompressedDirectory(localDirectoy string, s3FilePath 
 		return err
 	}
 
-	uploader := manager.NewUploader(a.client)
+	uploader := s3manager.NewUploader(a.s)
 
 	a.m.Lock()
 	ctxt, cancel := context.WithCancel(context.Background())
@@ -207,7 +217,7 @@ func (a *AWSSession) UploadCompressedDirectory(localDirectoy string, s3FilePath 
 		return err
 	}
 
-	_, err = uploader.Upload(ctxt, &s3.PutObjectInput{
+	_, err = uploader.UploadWithContext(ctxt, &s3manager.UploadInput{
 		Bucket: aws.String(a.bucket),
 		Key:    aws.String(s3FilePath),
 
@@ -227,7 +237,7 @@ func (a *AWSSession) DownloadFile(s3FilePath string, localFile string) error {
 		return err
 	}
 
-	downloader := manager.NewDownloader(a.client)
+	downloader := s3manager.NewDownloader(a.s)
 
 	a.m.Lock()
 	ctxt, cancel := context.WithCancel(context.Background())
@@ -235,7 +245,7 @@ func (a *AWSSession) DownloadFile(s3FilePath string, localFile string) error {
 	a.m.Unlock()
 	defer a.Cancel()
 
-	_, err = downloader.Download(ctxt, f, &s3.GetObjectInput{
+	_, err = downloader.DownloadWithContext(ctxt, f, &s3.GetObjectInput{
 		Bucket: aws.String(a.bucket),
 		Key:    aws.String(s3FilePath),
 	})
@@ -256,10 +266,10 @@ func (a *AWSSession) DownloadCompressedDirectory(s3FilePath string, localRootDir
 	a.m.Unlock()
 	defer a.Cancel()
 
-	downloader := manager.NewDownloader(a.client)
+	downloader := s3manager.NewDownloader(a.s)
 	downloader.Concurrency = 1
 
-	_, err = downloader.Download(ctxt, fakeWriterAt{file}, &s3.GetObjectInput{
+	_, err = downloader.DownloadWithContext(ctxt, fakeWriterAt{file}, &s3.GetObjectInput{
 		Bucket: aws.String(a.bucket),
 		Key:    aws.String(s3FilePath),
 	})
