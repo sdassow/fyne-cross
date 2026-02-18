@@ -32,10 +32,6 @@ type closer interface {
 }
 
 func commonRun(defaultContext Context, images []containerImage, builder platformBuilder) error {
-	if debugging() {
-		log.Debugf("fyne cross version: %s", getVersion())
-	}
-
 	for _, image := range images {
 		log.Infof("[i] Target: %s/%s", image.OS(), image.Architecture())
 		log.Debugf("%#v", image)
