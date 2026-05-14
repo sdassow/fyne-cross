@@ -174,7 +174,7 @@ func fyneCommandVersion(fyne string, ctx Context, image containerImage) string {
 		if err := cmd.Run(); err != nil {
 			return ""
 		}
-		out = string(buf.Bytes())
+		out = buf.String()
 	} else {
 		out, _ = image.Command(ctx.Volume, options{}, []string{fyne, "version"})
 	}
