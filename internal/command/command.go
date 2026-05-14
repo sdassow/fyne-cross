@@ -183,7 +183,9 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 
 	appBuildOpt := "-app-build"
 	appVersionOpt := "-app-version"
-	if fyneCommandVersionCompare(binary, "v2.0.0", ctx, image) >= 0 {
+
+	// Skip version check on macOS as it uses no container that could have a different version
+	if target != "darwin" && fyneCommandVersionCompare(binary, "v2.0.0", ctx, image) >= 0 {
 		appBuildOpt = "-appBuild"
 		appVersionOpt = "-appVersion"
 	}
