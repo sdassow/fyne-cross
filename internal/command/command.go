@@ -1,8 +1,10 @@
 package command
 
 import (
+	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -164,8 +166,19 @@ func checkFyneBinHost(ctx Context) (string, error) {
 }
 
 func fyneCommandVersion(fyne string, ctx Context, image containerImage) string {
-	out, _ := image.Command(ctx.Volume, options{}, []string{fyne, "version"})
-	for _, line := range strings.Split(string(out), "\n") {
+	var out string
+	if image.OS() == "darwin" {
+		buf := &bytes.Buffer{}
+		cmd := exec.Command(fyne, "version")
+		cmd.Stdout = buf
+		if err := cmd.Run(); err != nil {
+			return ""
+		}
+		out = string(buf.Bytes())
+	} else {
+		out, _ = image.Command(ctx.Volume, options{}, []string{fyne, "version"})
+	}
+	for _, line := range strings.Split(out, "\n") {
 		_, ver, found := strings.Cut(line, "fyne cli version: ")
 		if found {
 			return strings.TrimSuffix(ver, "\r")
@@ -184,8 +197,7 @@ func fyneCommand(binary, command, icon string, ctx Context, image containerImage
 	appBuildOpt := "-app-build"
 	appVersionOpt := "-app-version"
 
-	// Skip version check on macOS as it uses no container that could have a different version
-	if target != "darwin" && fyneCommandVersionCompare(binary, "v2.0.0", ctx, image) >= 0 {
+	if fyneCommandVersionCompare(binary, "v2.0.0", ctx, image) >= 0 {
 		appBuildOpt = "-appBuild"
 		appVersionOpt = "-appVersion"
 	}
