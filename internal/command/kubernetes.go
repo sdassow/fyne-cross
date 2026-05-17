@@ -151,7 +151,7 @@ func (i *kubernetesContainerImage) close() error {
 }
 
 func (i *kubernetesContainerImage) Run(vol volume.Volume, opts options, cmdArgs []string) error {
-	return i.pod.Run(opts.WorkDir, cmdArgs)
+	return i.pod.Run(context.Background(), opts.WorkDir, cmdArgs)
 }
 
 func AddAWSParameters(aws *cloud.AWSSession, command string, s ...string) []string {
@@ -214,8 +214,12 @@ func (i *kubernetesContainerImage) Prepare() error {
 		})
 	}
 
+	cgo := "1"
+	if i.os == webOS {
+		cgo = "0"
+	}
 	env := []cloud.Env{
-		{Name: "CGO_ENABLED", Value: "1"},                            // enable CGO
+		{Name: "CGO_ENABLED", Value: cgo},                            // enable CGO
 		{Name: "GOCACHE", Value: i.runner.vol.GoCacheDirContainer()}, // mount GOCACHE to reuse cache between builds
 	}
 	env = appendKubernetesEnv(env, i.runner.env)
